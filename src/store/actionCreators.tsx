@@ -2,11 +2,11 @@ import { AxiosResponse } from "axios";
 import { DataService } from "../services/Data";
 import { ADD_BOOKMARK, EDIT_BOOKMARK, REMOVE_BOOKMARK } from "./actionTypes";
 
-export const addBookmark = (url: string) => {
+export const addBookmark = (url: string, tags: string[] = []) => {
   const action: BookmarkAction = {
     type: ADD_BOOKMARK
   }
-  return addBookmarkHttpRequest(action, url);
+  return addBookmarkHttpRequest(action, url, tags);
 }
 
 export const removeBookmark = (bookmark: IBookmark) => {
@@ -20,13 +20,12 @@ export const removeBookmark = (bookmark: IBookmark) => {
 export const editBookmark = (bookmark: IBookmark) => {
   const action: BookmarkAction = {
     type: EDIT_BOOKMARK,
-    bookmark,
   }
-  return (dispatch: DispatchType) => dispatch(action)
+  return addBookmarkHttpRequest(action, bookmark.url)
 }
 
-export const addBookmarkHttpRequest = (action: BookmarkAction, url: string) => {
+export const addBookmarkHttpRequest = (action: BookmarkAction, url: string, tags?: string[]) => {
   return (dispatch: DispatchType) => {
-    DataService.getMetadata(url).then((response: AxiosResponse) => dispatch({ responseData: response.data, ...action }))
+    DataService.getMetadata(url).then((response: AxiosResponse) => dispatch({ responseData: response.data, tags: tags, ...action }))
   };
 }

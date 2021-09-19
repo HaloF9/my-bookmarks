@@ -1,34 +1,35 @@
 import moment from "moment";
 import { PROVIDER_TYPE } from "../enums/providerType";
 
-const getNewBookmark = (responseData: any): IBookmark | undefined => {
+const getNewBookmark = (action: any): IBookmark | undefined => {
+  const responseData = action.responseData
 
   if (responseData.provider_name === PROVIDER_TYPE.VIMEO) {
     const data: VimeoMetadataDto = responseData
     return {
-      id: data.video_id,
+      id: Math.random(),
       title: data.title,
+      url: data.url,
       author: data.author_name,
-      createdDate: moment().format(),
+      createdDate: moment().format('LLL'),
       height: data.height,
       width: data.width,
       duration: data.duration,
-      tags: []
+      tags: action.tags
     } as IVimeoBookmark
   }
   if (responseData.provider_name === PROVIDER_TYPE.FLICRK) {
     const data: FlickrMetadataDto = responseData
 
-    // In case of Flickr metadata, retrieve id from web_page url
-    const flirckId = (data.web_page.slice(data.author_url.length)).slice(0, -1)
     return {
-      id: parseInt(flirckId),
+      id: Math.random(),
       title: data.title,
+      url: data.url,
       author: data.author_name,
-      createdDate: moment().format(),
+      createdDate: moment().format('LLL'),
       height: data.height,
       width: data.width,
-      tags: []
+      tags: action.tags
     } as IFlickrBookmark
   }
 }

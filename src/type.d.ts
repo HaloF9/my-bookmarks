@@ -1,6 +1,7 @@
 interface IBookmark {
   id: number;
   title: string;
+  url: string;
   author: string;
   createdDate: string;
   height: number;
@@ -22,6 +23,7 @@ type BookmarkAction = {
   type: string;
   bookmark?: IBookmark;
   responseData?: string;
+  tags?: string[];
 };
 
 type DispatchType = (args: BookmarkAction) => BookmarkAction;

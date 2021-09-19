@@ -13,9 +13,12 @@ const reducer = (
   switch (action.type) {
     case ADD_BOOKMARK:
       const newBookmark =
-        BookmarkService.getNewBookmark(action.responseData)
+        BookmarkService.getNewBookmark(action)
 
-      if (newBookmark) return {
+      // Dont add an existing bookmark
+      const idAlreadyExist = state.bookmarks.find((bookmark) => bookmark.id === newBookmark?.id)
+
+      if (newBookmark && !idAlreadyExist) return {
         ...state,
         bookmarks: state.bookmarks.concat(newBookmark),
       }
@@ -24,24 +27,29 @@ const reducer = (
       return state
 
     case EDIT_BOOKMARK:
-      const updatedBookmarks: IBookmark[] = state.bookmarks.map(
-        (bookmark) => {
-          if (bookmark.id === action.bookmark?.id) return action.bookmark
-          return bookmark
-        }
-      )
+      const editedBookmark =
+        BookmarkService.getNewBookmark(action)
+
+      if (!editedBookmark) return state
+
+      // Update Bookmark list
+      const oldBookmarkIndex = state.bookmarks.findIndex((bookmark) => bookmark.id === editedBookmark?.id)
+      const updatedEditBookmarks = state.bookmarks
+
+      updatedEditBookmarks[oldBookmarkIndex] = editedBookmark
+
       return {
         ...state,
-        bookmarks: updatedBookmarks,
+        bookmarks: updatedEditBookmarks,
       }
 
     case REMOVE_BOOKMARK:
-      const updatedBookmarks2: IBookmark[] = state.bookmarks.filter(
+      const updatedBookmarks: IBookmark[] = state.bookmarks.filter(
         (bookmark) => bookmark.id !== action.bookmark?.id
       )
       return {
         ...state,
-        bookmarks: updatedBookmarks2,
+        bookmarks: updatedBookmarks,
       }
   }
   return state;
