@@ -1,6 +1,5 @@
 import { ADD_BOOKMARK, EDIT_BOOKMARK, REMOVE_BOOKMARK } from './actionTypes';
 
-import { BookmarkService } from '../services/Bookmark'
 
 const initialState: BookmarkState = {
   bookmarks: []
@@ -10,13 +9,13 @@ const reducer = (
   state: BookmarkState = initialState,
   action: BookmarkAction
 ): BookmarkState => {
+  const newBookmark = action.bookmark
+  let updatedBookmarks: IBookmark[]
   switch (action.type) {
     case ADD_BOOKMARK:
-      const newBookmark =
-        BookmarkService.getNewBookmark(action)
 
-      // Dont add an existing bookmark
-      const idAlreadyExist = state.bookmarks.find((bookmark) => bookmark.id === newBookmark?.id)
+      // Do not add an existing bookmark (based on randomly generated id's : not the best way)
+      const idAlreadyExist = state.bookmarks.find((bookmark) => bookmark.id === newBookmark.id)
 
       if (newBookmark && !idAlreadyExist) return {
         ...state,
@@ -27,25 +26,22 @@ const reducer = (
       return state
 
     case EDIT_BOOKMARK:
-      const editedBookmark =
-        BookmarkService.getNewBookmark(action)
-
-      if (!editedBookmark) return state
 
       // Update Bookmark list
-      const oldBookmarkIndex = state.bookmarks.findIndex((bookmark) => bookmark.id === editedBookmark?.id)
-      const updatedEditBookmarks = state.bookmarks
-
-      updatedEditBookmarks[oldBookmarkIndex] = editedBookmark
-
+      updatedBookmarks = state.bookmarks.map(
+        (bookmark) => {
+          if (bookmark.id === newBookmark.id) return newBookmark
+          return bookmark
+        }
+      )
       return {
         ...state,
-        bookmarks: updatedEditBookmarks,
+        bookmarks: updatedBookmarks,
       }
 
     case REMOVE_BOOKMARK:
-      const updatedBookmarks: IBookmark[] = state.bookmarks.filter(
-        (bookmark) => bookmark.id !== action.bookmark?.id
+      updatedBookmarks = state.bookmarks.filter(
+        (bookmark) => bookmark.id !== action.bookmark.id
       )
       return {
         ...state,

@@ -37,15 +37,14 @@ export const EditBookmarkModalButton: React.FC<EditBookmarkModalButtonProps> = (
   const { handleSubmit, control } = useForm()
 
   const onSubmit = (data: any) => {
-    bookmark.url = data.url
-    editAndSaveBookmark(bookmark)
+    editAndSaveBookmark(bookmark, data.url)
     handleClose()
   }
 
   const editAndSaveBookmark = React.useCallback(
-    (bookmark: any) => {
+    (bookmark: IBookmark, url: string) => {
       try {
-        dispatch(editBookmark(bookmark))
+        dispatch(editBookmark(bookmark, url))
       } catch (error) {
         // TODO catch and display error
         console.log(error)

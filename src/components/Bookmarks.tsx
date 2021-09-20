@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { Dispatch } from "redux"
 import { useDispatch } from "react-redux"
 import {
@@ -35,9 +35,12 @@ export const Bookmarks: React.FC<BookmarkProps> = ({ bookmarks, removeBookmark }
     (bookmark: IBookmark) => dispatch(removeBookmark(bookmark)),
     [dispatch, removeBookmark]
   )
+  const ROWS_PER_PAGES = 3
 
+  useEffect(() => {
+    if (bookmarks.length <= page * ROWS_PER_PAGES && bookmarks.length !== 0) setPage(page - 1)
+  }, [bookmarks, page])
 
-  const ROWS_PER_PAGES = 10
 
   return (
     <>
@@ -58,7 +61,7 @@ export const Bookmarks: React.FC<BookmarkProps> = ({ bookmarks, removeBookmark }
                 </TableRow>
               </TableHead>
               <TableBody>
-                {bookmarks.slice(page * ROWS_PER_PAGES).map((row) => (
+                {bookmarks.slice(page * ROWS_PER_PAGES, page * ROWS_PER_PAGES + ROWS_PER_PAGES).map((row) => (
                   <TableRow key={row.id}>
                     <TableCell component="th" scope="row">{row.title}</TableCell>
                     <TableCell align="right">{row.createdDate}</TableCell>

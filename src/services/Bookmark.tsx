@@ -1,8 +1,9 @@
+import { AxiosResponse } from "axios";
 import moment from "moment";
 import { PROVIDER_TYPE } from "../enums/providerType";
 
-const getNewBookmark = (action: any): IBookmark | undefined => {
-  const responseData = action.responseData
+const getNewBookmark = (response: AxiosResponse, tags: string[]): IBookmark | undefined => {
+  const responseData = response.data
 
   if (responseData.provider_name === PROVIDER_TYPE.VIMEO) {
     const data: VimeoMetadataDto = responseData
@@ -15,7 +16,7 @@ const getNewBookmark = (action: any): IBookmark | undefined => {
       height: data.height,
       width: data.width,
       duration: data.duration,
-      tags: action.tags
+      tags: tags
     } as IVimeoBookmark
   }
   if (responseData.provider_name === PROVIDER_TYPE.FLICRK) {
@@ -29,10 +30,14 @@ const getNewBookmark = (action: any): IBookmark | undefined => {
       createdDate: moment().format('LLL'),
       height: data.height,
       width: data.width,
-      tags: action.tags
+      tags: tags
     } as IFlickrBookmark
   }
+
+  // TODO Error, bad url, bad provider, ... Management
+
 }
+
 
 export const BookmarkService = {
   getNewBookmark

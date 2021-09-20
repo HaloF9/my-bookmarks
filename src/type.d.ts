@@ -21,9 +21,7 @@ type BookmarkState = {
 
 type BookmarkAction = {
   type: string;
-  bookmark?: IBookmark;
-  responseData?: string;
-  tags?: string[];
+  bookmark: IBookmark;
 };
 
 type DispatchType = (args: BookmarkAction) => BookmarkAction;

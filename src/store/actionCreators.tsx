@@ -1,12 +1,22 @@
 import { AxiosResponse } from "axios";
+import { BookmarkService } from "../services/Bookmark";
 import { DataService } from "../services/Data";
 import { ADD_BOOKMARK, EDIT_BOOKMARK, REMOVE_BOOKMARK } from "./actionTypes";
 
 export const addBookmark = (url: string, tags: string[] = []) => {
-  const action: BookmarkAction = {
-    type: ADD_BOOKMARK
-  }
-  return addBookmarkHttpRequest(action, url, tags);
+
+  return (dispatch: DispatchType) => getBookmarkFromUrl(url, tags).then(
+    (newBookmark) => {
+
+      if (!newBookmark) return // TODO Dispatch error action 
+
+      const action: BookmarkAction = {
+        type: ADD_BOOKMARK,
+        bookmark: newBookmark
+      }
+      dispatch(action)
+    }
+  )
 }
 
 export const removeBookmark = (bookmark: IBookmark) => {
@@ -17,15 +27,23 @@ export const removeBookmark = (bookmark: IBookmark) => {
   return (dispatch: DispatchType) => dispatch(action)
 }
 
-export const editBookmark = (bookmark: IBookmark) => {
-  const action: BookmarkAction = {
-    type: EDIT_BOOKMARK,
-  }
-  return addBookmarkHttpRequest(action, bookmark.url)
+export const editBookmark = (previousBookmark: IBookmark, newUrl: string) => {
+  return (dispatch: DispatchType) => getBookmarkFromUrl(newUrl, previousBookmark.tags).then(
+    (newBookmark) => {
+
+      if (!newBookmark) return // TODO Dispatch error action 
+
+      newBookmark.id = previousBookmark.id
+
+      const action: BookmarkAction = {
+        type: EDIT_BOOKMARK,
+        bookmark: newBookmark
+      }
+      dispatch(action)
+    }
+  )
 }
 
-export const addBookmarkHttpRequest = (action: BookmarkAction, url: string, tags?: string[]) => {
-  return (dispatch: DispatchType) => {
-    DataService.getMetadata(url).then((response: AxiosResponse) => dispatch({ responseData: response.data, tags: tags, ...action }))
-  };
+export const getBookmarkFromUrl = (url: string, tags: string[] = []) => {
+  return DataService.getMetadata(url).then((response: AxiosResponse) => BookmarkService.getNewBookmark(response, tags))
 }
