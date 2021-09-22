@@ -14,9 +14,9 @@ const App: React.FC = () => {
   const dispatch: Dispatch<any> = useDispatch()
 
   const saveBookmark = React.useCallback(
-    (payload: any) => {
+    (bookmark: IBookmark) => {
       try {
-        dispatch(addBookmark(payload.url, payload.tags))
+        dispatch(addBookmark(bookmark.url, bookmark.tags))
       } catch (error) {
         // TODO catch and display error
         console.log(error)
