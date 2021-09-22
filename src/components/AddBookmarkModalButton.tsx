@@ -15,11 +15,6 @@ const style = {
   p: 4,
 }
 
-const formStyle = {
-  display: 'flex',
-  flexDirection: 'column'
-}
-
 type AddBookmarkModalButtonProps = {
   saveBookmark: (bookmark: IBookmark | any) => void
 }

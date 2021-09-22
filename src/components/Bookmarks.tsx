@@ -1,6 +1,6 @@
 import React, { useEffect } from "react"
 import { Dispatch } from "redux"
-import { useDispatch } from "react-redux"
+import { shallowEqual, useDispatch, useSelector } from "react-redux"
 import {
   Button,
   ButtonGroup,
@@ -13,38 +13,62 @@ import {
   TableHead,
   TablePagination,
   TableRow
-} from "@material-ui/core";
-import { EditBookmarkModalButton } from "./EditBookmarkModalButton";
+} from "@material-ui/core"
+import { EditBookmarkModalButton } from "./EditBookmarkModalButton"
+import { editBookmark, removeBookmark } from "../store/actionCreators"
 
 
-type BookmarkProps = {
-  bookmarks: IBookmark[]
-  removeBookmark: (bookmark: IBookmark) => void
-}
+type BookmarkProps = {} // Add specifics props if needed
 
-export const Bookmarks: React.FC<BookmarkProps> = ({ bookmarks, removeBookmark }: BookmarkProps) => {
+export const Bookmarks: React.FC<BookmarkProps> = (props: BookmarkProps) => {
+
   const dispatch: Dispatch<any> = useDispatch()
+  const [page, setPage] = React.useState(0)
 
-  const [page, setPage] = React.useState(0);
-
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  }
-
-  const deleteBookmark = React.useCallback(
-    (bookmark: IBookmark) => dispatch(removeBookmark(bookmark)),
-    [dispatch, removeBookmark]
+  const bookmarks: IBookmark[] = useSelector(
+    (state: BookmarkState) => state.bookmarks,
+    shallowEqual
   )
+
+  // Delete cb
+  const deleteBookmark = React.useCallback(
+    (bookmark: IBookmark) => {
+      try {
+        dispatch(removeBookmark(bookmark))
+      } catch (error) {
+        // TODO catch and display error
+        console.log(error)
+      }
+    },
+    [dispatch]
+  )
+
+  // Edit cb
+  const editAndSaveBookmark = React.useCallback(
+    (bookmark: IBookmark, url: string) => {
+      try {
+        dispatch(editBookmark(bookmark, url))
+      } catch (error) {
+        // TODO catch and display error
+        console.log(error)
+      }
+    },
+    [dispatch]
+  )
+
+  // Pagination Management
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage)
+  }
   const ROWS_PER_PAGES = 3
 
   useEffect(() => {
     if (bookmarks.length <= page * ROWS_PER_PAGES && bookmarks.length !== 0) setPage(page - 1)
   }, [bookmarks, page])
 
-
   return (
     <>
-      {bookmarks.length &&
+      {!!bookmarks.length &&
         <>
           <TableContainer component={Paper}>
             <Table size="small" >
@@ -61,8 +85,8 @@ export const Bookmarks: React.FC<BookmarkProps> = ({ bookmarks, removeBookmark }
                 </TableRow>
               </TableHead>
               <TableBody>
-                {bookmarks.slice(page * ROWS_PER_PAGES, page * ROWS_PER_PAGES + ROWS_PER_PAGES).map((row) => (
-                  <TableRow key={row.id}>
+                {bookmarks.slice(page * ROWS_PER_PAGES, page * ROWS_PER_PAGES + ROWS_PER_PAGES).map((row, index) => (
+                  <TableRow key={index}>
                     <TableCell component="th" scope="row">{row.title}</TableCell>
                     <TableCell align="right">{row.createdDate}</TableCell>
                     <TableCell align="right">{row.author}</TableCell>
@@ -77,7 +101,7 @@ export const Bookmarks: React.FC<BookmarkProps> = ({ bookmarks, removeBookmark }
                     <TableCell align="right">{row.tags?.map(tag => `${tag} `)}</TableCell>
                     <TableCell align="right">
                       <ButtonGroup variant="outlined" aria-label="outlined button group">
-                        <EditBookmarkModalButton bookmark={row} />
+                        <EditBookmarkModalButton bookmark={row} editAndSaveBookmark={editAndSaveBookmark} />
                         <Button onClick={() => deleteBookmark(row)}>Delete</Button>
                       </ButtonGroup>
                     </TableCell>

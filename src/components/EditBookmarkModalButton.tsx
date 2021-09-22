@@ -2,9 +2,6 @@ import React from 'react'
 
 import { Box, Button, Modal, TextField } from '@material-ui/core'
 import { Controller, useForm } from 'react-hook-form'
-import { useDispatch } from 'react-redux'
-import { Dispatch } from 'redux'
-import { editBookmark } from '../store/actionCreators'
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -18,21 +15,18 @@ const style = {
   p: 4,
 }
 
-const formStyle = {
-  display: 'flex',
-  flexDirection: 'column'
-}
-
 type EditBookmarkModalButtonProps = {
-  bookmark: IBookmark
+  bookmark: IBookmark,
+  editAndSaveBookmark: (bookmark: IBookmark | any, newUrl: string) => void
 }
 
-export const EditBookmarkModalButton: React.FC<EditBookmarkModalButtonProps> = ({ bookmark }: EditBookmarkModalButtonProps) => {
+export const EditBookmarkModalButton: React.FC<EditBookmarkModalButtonProps> = (
+  { bookmark, editAndSaveBookmark }: EditBookmarkModalButtonProps
+) => {
 
   const [open, setOpen] = React.useState(false)
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
-  const dispatch: Dispatch<any> = useDispatch()
 
   const { handleSubmit, control } = useForm()
 
@@ -40,18 +34,6 @@ export const EditBookmarkModalButton: React.FC<EditBookmarkModalButtonProps> = (
     editAndSaveBookmark(bookmark, data.url)
     handleClose()
   }
-
-  const editAndSaveBookmark = React.useCallback(
-    (bookmark: IBookmark, url: string) => {
-      try {
-        dispatch(editBookmark(bookmark, url))
-      } catch (error) {
-        // TODO catch and display error
-        console.log(error)
-      }
-    },
-    [dispatch]
-  )
 
   return (
     <div>

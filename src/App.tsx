@@ -1,18 +1,15 @@
 import React from "react"
-import { useSelector, shallowEqual, useDispatch } from "react-redux"
-import "./App.sass"
-
-import { Bookmarks } from "./components/Bookmarks"
-import { addBookmark, removeBookmark } from "./store/actionCreators"
 import { Dispatch } from "redux"
-import { AddBookmarkModalButton } from "./components/AddBookmarkModalButton"
+import { useDispatch } from "react-redux"
 import { Paper, Typography } from "@material-ui/core"
 
+import { addBookmark } from "./store/actionCreators"
+import { Bookmarks } from "./components/Bookmarks"
+import { AddBookmarkModalButton } from "./components/AddBookmarkModalButton"
+
+import "./App.sass"
+
 const App: React.FC = () => {
-  const bookmarks: IBookmark[] = useSelector(
-    (state: BookmarkState) => state.bookmarks,
-    shallowEqual
-  )
 
   const dispatch: Dispatch<any> = useDispatch()
 
@@ -32,10 +29,7 @@ const App: React.FC = () => {
     <Paper>
       <Typography variant='h1' align='center'>My Bookmarks</Typography>
       <AddBookmarkModalButton saveBookmark={saveBookmark} />
-      <Bookmarks
-        bookmarks={bookmarks}
-        removeBookmark={removeBookmark}
-      />
+      <Bookmarks />
     </Paper>
   )
 }
